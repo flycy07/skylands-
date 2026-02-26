@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skylanders Portal Scanner</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #0b0e14; color: white; text-align: center; margin: 0; padding: 20px; overflow: hidden; }
+        .container { border: 1px solid #3a3a3a; border-radius: 10px; padding: 20px; background: linear-gradient(180deg, #1a1c23 0%, #0d0f14 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { font-size: 18px; letter-spacing: 1px; color: #00ccff; text-transform: uppercase; margin-bottom: 5px; }
+        
+        /* Box Fotocamera Realistica */
+        #camera-container { width: 100%; height: 300px; background: #000; border-radius: 8px; margin: 15px 0; position: relative; overflow: hidden; border: 2px solid #222; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Linea di Scansione */
+        .scan-line { position: absolute; width: 100%; height: 2px; background: rgba(0, 255, 255, 0.8); box-shadow: 0 0 15px #00ffff; top: 0; animation: scan 2.5s ease-in-out infinite; display: none; z-index: 10; }
+        @keyframes scan { 0%, 100% { top: 5%; } 50% { top: 95%; } }
+
+        /* Pulsante */
+        button { background: #007bff; color: white; border: none; width: 100%; padding: 15px; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        button:active { background: #0056b3; transform: scale(0.98); }
+
+        /* Risultato */
+        #result { margin-top: 20px; padding: 15px; border: 1px dashed #444; background: rgba(0,0,0,0.3); display: none; }
+        #price { font-size: 36px; color: #ff3b30; display: block; font-weight: 800; margin: 5px 0; }
+        
+        /* Branding Activision */
+        .brand { font-size: 10px; color: #666; margin-top: 30px; letter-spacing: 2px; text-transform: uppercase; cursor: default; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Portal <span style="color:#fff">Scanner</span> v2.1</h2>
+    <p style="font-size: 12px; color: #888;">Inquadra lo Skylander per la stima ufficiale</p>
+    
+    <div id="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <div class="scan-line" id="line"></div>
+    </div>
+
+    <button id="scanBtn" onclick="avviaScansione()">Analizza Statuetta</button>
+
+    <div id="result">
+        <small style="color:#888">VALUTAZIONE ATTUALE (EUR):</small>
+        <span id="price">€ 0,00</span>
+        <div style="font-size: 9px; color: #555;">ID: 882-XPL-SCAN-9921</div>
+    </div>
+</div>
+
+<div class="brand" onclick="attivaTroll()">© 2026 Activision Blizzard, Inc.</div>
+
+<script>
+    const video = document.getElementById('video');
+    let trollMode = false;
+
+    // Attiva la fotocamera all'avvio
+    async function setupCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+            video.srcObject = stream;
+        } catch (err) {
+            alert("Errore fotocamera: " + err);
+        }
+    }
+
+    function attivaTroll() {
+        trollMode = true;
+        // Feedback vibrazione leggero se supportato
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    function avviaScansione() {
+        const btn = document.getElementById('scanBtn');
+        const line = document.getElementById('line');
+        const res = document.getElementById('result');
+        const price = document.getElementById('price');
+
+        btn.disabled = true;
+        btn.innerText = "IDENTIFICAZIONE...";
+        line.style.display = "block";
+        res.style.display = "none";
+
+        setTimeout(() => {
+            line.style.display = "none";
+            
+            let valore;
+            if (trollMode) {
+                // Se hai cliccato il logo Activision, il prezzo crolla
+                valore = (Math.random() * (0.45 - 0.10) + 0.10).toFixed(2);
+                trollMode = false; 
+            } else {
+                // Valore "normale" ma comunque basso
+                valore = (Math.random() * (4.20 - 0.60) + 0.60).toFixed(2);
+            }
+            
+            price.innerText = "€ " + valore;
+            res.style.display = "block";
+            btn.disabled = false;
+            btn.innerText = "SCANSIONA ALTRO";
+        }, 3500);
+    }
+
+    setupCamera();
+</script>
+
+</body>
+</html>
